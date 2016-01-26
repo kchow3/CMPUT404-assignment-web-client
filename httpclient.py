@@ -33,16 +33,27 @@ class HTTPRequest(object):
         self.body = body
 
 class HTTPClient(object):
+
+    HTTP_REQ = ' HTTP/1.1 \r\n'
+    HTTP_CONNECTION = 'Connection: keep-alive \r\n'
+    HTTP_ACCEPT = 'Accept: text/html,text/plain,application/xhtml+xml,application/xml,application/json; \r\n'
+    HTTP_CONTENT_TYPE = 'Content-Type: application/x-www-form-urlencoded,application/json; \r\n'
+    HTTP_CONTENT_LENGTH = 'Content-Length: '
+    CRLF = '\r\n'
+
     #def get_host_port(self,url):
 
     def connect(self, host, port):
         # use sockets!
-        return None
+        clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        clientSocket.connect((host, port))
+        return clientSocket
 
     def get_code(self, data):
         return None
 
-    def get_headers(self,data):
+    def get_headers(self, data):
+        # request = 
         return None
 
     def get_body(self, data):
@@ -60,12 +71,44 @@ class HTTPClient(object):
                 done = not part
         return str(buffer)
 
+    def urlParse(self, url):
+        #regex from http://stackoverflow.com/questions/27745/getting-parts-of-a-url-regex
+        match = re.search('^((http[s]?|ftp):\/\/)?\/?([^\/\.]+\.)*?([^\/\.]+\.[^:\/\s\.]{2,3}(\.[^:\/\s\.]‌​{2,3})?)(:\d+)?($|\/)([^#?\s]+)?(.*?)?(#[\w\-]+)?$', url)
+
+        if(match.group(4) == 'None'):
+            raise Exception('No hostname')
+        else:
+            self.host = match.group(4)
+
+        if(match.group(6) == 'None'):
+            self.port = 80
+        else:
+            self.port = match.group(6)
+            self.port = self.port[1:]
+
+        if(match.group(8) == 'None'):
+            self.path = '/'
+        else:
+            self.path = match.group(8)
+
+        print self.host
+        print self.port
+        print self.path
+
     def GET(self, url, args=None):
-        code = 500
-        body = ""
+        self.method = 'GET'
+        self.urlParse(url)
+        # socket = self.connect(self.host, self.post)
+
+        # request = self.get_headers()
+        # socket.sendall(request)
+
+        # code = self.get_code()
+        # body = self.get_body()
         return HTTPRequest(code, body)
 
     def POST(self, url, args=None):
+        self.method = 'POST'
         code = 500
         body = ""
         return HTTPRequest(code, body)
