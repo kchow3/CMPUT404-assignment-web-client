@@ -52,9 +52,15 @@ class HTTPClient(object):
     def get_code(self, data):
         return None
 
-    def get_headers(self, data):
-        # request =
-        return None
+    def get_headers(self, data=None):
+        request += self.method + ' /' + self.path + self.HTTP_REQ + self.HTTP_CONNECTION + self.HTTP_ACCEPT + self.HTTP_CONTENT_TYPE
+
+        if(self.method == "POST"):
+            request += request + self.Content-Length + len(data) + self.CRLF + self.CRLF + data
+        else:
+            request += request + self.CRLF
+
+        return request
 
     def get_body(self, data):
         return None
@@ -75,19 +81,19 @@ class HTTPClient(object):
         #regex from http://stackoverflow.com/questions/27745/getting-parts-of-a-url-regex
         match = re.search('^((http[s]?|ftp):\/\/)?\/?([^\/\.]+\.)*?([^\/\.]+\.[^:\/\s\.]{2,3}(\.[^:\/\s\.]‌​{2,3})?)(:\d+)?($|\/)([^#?\s]+)?(.*?)?(#[\w\-]+)?$', url)
 
-        if(match.group(4) == 'None'):
+        if(match.group(4) is None):
             raise Exception('No hostname')
         else:
             self.host = match.group(4)
 
-        if(match.group(6) == 'None'):
+        if(match.group(6) is None):
             self.port = 80
         else:
             self.port = match.group(6)
             self.port = self.port[1:]
 
-        if(match.group(8) == 'None'):
-            self.path = '/'
+        if(match.group(8) is None):
+            self.path = ''
         else:
             self.path = match.group(8)
 
@@ -99,15 +105,15 @@ class HTTPClient(object):
 
         self.method = 'GET'
         self.urlParse(url)
-        # socket = self.connect(self.host, self.post)
+        socket = self.connect(self.host, self.post)
 
-        # request = self.get_headers()
-        # socket.sendall(request)
+        request = self.get_headers()
+        socket.sendall(request)
+        response = self.recvall(socket)
 
-        # code = self.get_code()
-        # body = self.get_body()
-        code = 500
-        body = ""
+        code = self.get_code(response)
+        body = self.get_body(response)
+
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
