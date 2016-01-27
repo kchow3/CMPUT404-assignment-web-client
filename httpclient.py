@@ -36,7 +36,7 @@ class HTTPClient(object):
 
     HTTP_REQ = ' HTTP/1.1 \r\n'
     HTTP_CONNECTION = 'Connection: keep-alive \r\n'
-    HTTP_ACCEPT = 'Accept: text/html,text/plain,application/xhtml+xml,application/xml,application/json; \r\n'
+    HTTP_ACCEPT = 'Accept: text/html,text/plain,text/css,application/xhtml+xml,application/xml,application/json; \r\n'
     HTTP_CONTENT_TYPE = 'Content-Type: application/x-www-form-urlencoded,application/json; \r\n'
     HTTP_CONTENT_LENGTH = 'Content-Length: '
     CRLF = '\r\n'
@@ -50,13 +50,18 @@ class HTTPClient(object):
         return clientSocket
 
     def get_code(self, data):
-        return None
+        sections = data.split('\r\n\r\n')
+        header_lines = str.splitlines(sections[0])
+        http_line = header_lines[0].split()
+        return http_line[1]
 
     def get_headers(self, data):
-        return None
+        sections = data.split('\r\n\r\n')
+        return sections[0]
 
     def get_body(self, data):
-        return None
+        sections = data.split('\r\n\r\n')
+        return sections[1]
 
     def build_request(self, data=None):
         request = ''
@@ -111,12 +116,9 @@ class HTTPClient(object):
         socket = self.connect(self.host, self.port)
         socket.sendall(request)
         response = self.recvall(socket)
-        print response
 
-        # code = self.get_code(response)
-        # body = self.get_body(response)
-        code = 500
-        body = ""
+        code = self.get_code(response)
+        body = self.get_body(response)
 
         return HTTPResponse(code, body)
 
