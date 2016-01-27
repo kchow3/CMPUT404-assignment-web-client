@@ -53,7 +53,7 @@ class HTTPClient(object):
         sections = data.split('\r\n\r\n')
         header_lines = str.splitlines(sections[0])
         http_line = header_lines[0].split()
-        return http_line[1]
+        return int(http_line[1])
 
     def get_headers(self, data):
         sections = data.split('\r\n\r\n')
@@ -88,23 +88,26 @@ class HTTPClient(object):
 
     def urlParse(self, url):
         #regex from http://stackoverflow.com/questions/27745/getting-parts-of-a-url-regex
-        match = re.search('^((http[s]?|ftp):\/\/)?\/?([^\/\.]+\.)*?([^\/\.]+\.[^:\/\s\.]{2,3}|(localhost)(\.[^:\/\s\.]‌​{2,3})?)(:\d+)?($|\/)([^#?\s]+)?(.*?)?(#[\w\-]+)?$', url)
+        match = re.search('^((http[s]?):\/\/)?\/?([^\/\.]+\.)*?([^\/\.]+\.[^:\/\s\.]{2,3}|(localhost|LOCALHOST|(127\.0\.0\.1))(\.[^:\/\s\.]‌​{2,3})?)(:\d+)?($|\/)([^#?\s]+)?(.*?)?(#[\w\-]+)?$', url)
 
-        if(match.group(4) is None):
-            raise Exception('No hostname')
-        else:
-            self.host = match.group(4)
+        try:
+            if(match.group(4) is None):
+                raise Exception('No hostname')
+            else:
+                self.host = match.group(4)
 
-        if(match.group(7) is None):
-            self.port = 80
-        else:
-            self.port = match.group(7)
-            self.port = int(self.port[1:])
+            if(match.group(8) is None):
+                self.port = 80
+            else:
+                self.port = match.group(8)
+                self.port = int(self.port[1:])
 
-        if(match.group(9) is None):
-            self.path = ''
-        else:
-            self.path = match.group(9)
+            if(match.group(10) is None):
+                self.path = ''
+            else:
+                self.path = match.group(10)
+        except:
+            raise Exception('Could not parse url. Not a valid url')
 
     def GET(self, url, args=None):
 
