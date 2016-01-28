@@ -35,8 +35,9 @@ class HTTPResponse(object):
 class HTTPClient(object):
 
     HTTP_REQ = ' HTTP/1.1 \r\n'
+    HTTP_HOST = 'HOST: '
     HTTP_CONNECTION = 'Connection: keep-alive \r\n'
-    HTTP_ACCEPT = 'Accept: text/html,text/plain,text/css,application/xhtml+xml,application/xml,application/json; \r\n'
+    HTTP_ACCEPT = 'Accept: text/html,text/plain,text/css,application/xhtml+xml,application/xml,application/json,application/x-www-form-urlencoded; \r\n'
     HTTP_CONTENT_TYPE = 'Content-Type: application/x-www-form-urlencoded,application/json; \r\n'
     HTTP_CONTENT_LENGTH = 'Content-Length: '
     CRLF = '\r\n'
@@ -65,10 +66,10 @@ class HTTPClient(object):
 
     def build_request(self, data=None):
         request = ''
-        request += self.method + ' /' + self.path + self.HTTP_REQ + self.HTTP_CONNECTION + self.HTTP_ACCEPT + self.HTTP_CONTENT_TYPE
+        request += self.method + ' /' + self.path + self.HTTP_REQ + self.HTTP_HOST + self.host + self.CRLF + self.HTTP_CONNECTION + self.HTTP_ACCEPT + self.HTTP_CONTENT_TYPE
 
         if(self.method == "POST"):
-            request += request + self.Content-Length + len(data) + self.CRLF + self.CRLF + data
+            request += request + self.HTTP_CONTENT_LENGTH + str(len(data)) + self.CRLF + self.CRLF + data
         else:
             request += request + self.CRLF
 
@@ -127,8 +128,22 @@ class HTTPClient(object):
 
     def POST(self, url, args=None):
         self.method = 'POST'
-        code = 500
-        body = ""
+        self.urlParse(url)
+
+        encoded_args = ''
+        if(args):
+            encoded_args = urllib.urlencode(args)
+
+        request = ''
+        request = self.build_request(encoded_args)
+
+        socket = self.connect(self.host, self.port)
+        socket.sendall(request)
+        response = self.recvall(socket)
+
+        code = self.get_code(response)
+        body = self.get_body(response)
+
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
