@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
-<<<<<<< HEAD
-# Copyright 2013 Abram Hindle
-#
-=======
 # Copyright 2016 Abram Hindle, https://github.com/tywtyw2002, and https://github.com/treedust
 # 
->>>>>>> 10ad7884407a205ac7308b9b83436966cabd8898
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -41,9 +36,10 @@ class HTTPClient(object):
 
     HTTP_REQ = ' HTTP/1.1 \r\n'
     HTTP_HOST = 'HOST: '
-    HTTP_USER_AGENT = 'User-Agent: Mozilla/5.0 \r\n'
-    HTTP_CONNECTION = 'Connection: keep-alive \r\n'
-    HTTP_ACCEPT = 'Accept: text/html,text/plain,text/css,application/xhtml+xml,application/xml,application/json,application/x-www-form-urlencoded; \r\n'
+    HTTP_USER_AGENT = 'User-Agent: Mozilla/5.0 Chrome/48.0.2564.82 Safari/537.36\r\n'
+    HTTP_CONNECTION = 'Connection: close \r\n'
+    HTTP_ACCEPT = 'Accept: text/html,text/plain,text/css,application/xhtml+xml,application/xml,application/json; \r\n'
+    HTTP_ACCEPT_LANG = 'Accept-Language: en-US \r\n'
     HTTP_CONTENT_TYPE = 'Content-Type: application/x-www-form-urlencoded,application/json; \r\n'
     HTTP_CONTENT_LENGTH = 'Content-Length: '
     CRLF = '\r\n'
@@ -72,12 +68,12 @@ class HTTPClient(object):
 
     def build_request(self, data=None):
         request = ''
-        request += self.method + ' /' + self.path + self.HTTP_REQ + self.HTTP_HOST + self.host + ':' + str(self.port) + self.CRLF + self.HTTP_USER_AGENT + self.HTTP_CONNECTION + self.HTTP_ACCEPT + self.HTTP_CONTENT_TYPE
+        request += self.method + ' /' + self.path + self.HTTP_REQ + self.HTTP_HOST + self.host + ':' + str(self.port) + self.CRLF + self.HTTP_USER_AGENT + self.HTTP_CONNECTION + self.HTTP_ACCEPT + self.HTTP_ACCEPT_LANG
 
         if(self.method == "POST"):
-            request += request + self.HTTP_CONTENT_LENGTH + str(len(data)) + self.CRLF + self.CRLF + data
+            request += self.HTTP_CONTENT_TYPE + self.HTTP_CONTENT_LENGTH + str(len(data)) + self.CRLF + self.CRLF + data
         else:
-            request += request + self.CRLF
+            request += self.CRLF
 
         return request
 
@@ -94,25 +90,25 @@ class HTTPClient(object):
         return str(buffer)
 
     def urlParse(self, url):
-        #regex from http://stackoverflow.com/questions/27745/getting-parts-of-a-url-regex
-        match = re.search('^((http[s]?):\/\/)?\/?([^\/\.]+\.)*?([^\/\.]+\.[^:\/\s\.]{2,3}|(localhost|LOCALHOST|(127\.0\.0\.1))(\.[^:\/\s\.]‌​{2,3})?)(:\d+)?($|\/)([^#?\s]+)?(.*?)?(#[\w\-]+)?$', url)
+        #regex based from http://stackoverflow.com/questions/27745/getting-parts-of-a-url-regex
+        match = re.search('^(http[s]?:\/\/)?(([^:\/])+)(:\d+)?($|\/)([^#?\s]+)?(.*?)?(#[\w\-]+)?$', url)
 
         try:
-            if(match.group(4) is None):
+            if(match.group(2) is None):
                 raise Exception('No hostname')
             else:
-                self.host = match.group(4)
+                self.host = match.group(2)
 
-            if(match.group(8) is None):
+            if(match.group(4) is None):
                 self.port = 80
             else:
-                self.port = match.group(8)
+                self.port = match.group(4)
                 self.port = int(self.port[1:])
 
-            if(match.group(10) is None):
+            if(match.group(6) is None):
                 self.path = ''
             else:
-                self.path = match.group(10)
+                self.path = match.group(6)
         except:
             raise Exception('Could not parse url. Not a valid url')
 
@@ -130,7 +126,7 @@ class HTTPClient(object):
         code = self.get_code(response)
         body = self.get_body(response)
 
-        #print body
+        print body
 
         return HTTPResponse(code, body)
 
@@ -152,7 +148,7 @@ class HTTPClient(object):
         code = self.get_code(response)
         body = self.get_body(response)
 
-        #print body
+        print body
 
         return HTTPResponse(code, body)
 
