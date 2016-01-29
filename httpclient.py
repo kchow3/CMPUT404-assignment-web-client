@@ -67,7 +67,7 @@ class HTTPClient(object):
 
     def build_request(self, data=None):
         request = ''
-        request += self.method + ' /' + self.path + self.HTTP_REQ + self.HTTP_HOST + self.host + ':' + self.port + self.CRLF + self.HTTP_USER_AGENT + self.HTTP_CONNECTION + self.HTTP_ACCEPT + self.HTTP_CONTENT_TYPE
+        request += self.method + ' /' + self.path + self.HTTP_REQ + self.HTTP_HOST + self.host + ':' + str(self.port) + self.CRLF + self.HTTP_USER_AGENT + self.HTTP_CONNECTION + self.HTTP_ACCEPT + self.HTTP_CONTENT_TYPE
 
         if(self.method == "POST"):
             request += request + self.HTTP_CONTENT_LENGTH + str(len(data)) + self.CRLF + self.CRLF + data
