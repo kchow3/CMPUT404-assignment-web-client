@@ -36,6 +36,7 @@ class HTTPClient(object):
 
     HTTP_REQ = ' HTTP/1.1 \r\n'
     HTTP_HOST = 'HOST: '
+    HTTP_USER_AGENT = 'User-Agent: Mozilla/5.0 \r\n'
     HTTP_CONNECTION = 'Connection: keep-alive \r\n'
     HTTP_ACCEPT = 'Accept: text/html,text/plain,text/css,application/xhtml+xml,application/xml,application/json,application/x-www-form-urlencoded; \r\n'
     HTTP_CONTENT_TYPE = 'Content-Type: application/x-www-form-urlencoded,application/json; \r\n'
@@ -66,7 +67,7 @@ class HTTPClient(object):
 
     def build_request(self, data=None):
         request = ''
-        request += self.method + ' /' + self.path + self.HTTP_REQ + self.HTTP_HOST + self.host + self.CRLF + self.HTTP_CONNECTION + self.HTTP_ACCEPT + self.HTTP_CONTENT_TYPE
+        request += self.method + ' /' + self.path + self.HTTP_REQ + self.HTTP_HOST + self.host + ':' + self.port + self.CRLF + self.HTTP_USER_AGENT + self.HTTP_CONNECTION + self.HTTP_ACCEPT + self.HTTP_CONTENT_TYPE
 
         if(self.method == "POST"):
             request += request + self.HTTP_CONTENT_LENGTH + str(len(data)) + self.CRLF + self.CRLF + data
@@ -124,6 +125,8 @@ class HTTPClient(object):
         code = self.get_code(response)
         body = self.get_body(response)
 
+        #print body
+
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
@@ -143,6 +146,8 @@ class HTTPClient(object):
 
         code = self.get_code(response)
         body = self.get_body(response)
+
+        #print body
 
         return HTTPResponse(code, body)
 
