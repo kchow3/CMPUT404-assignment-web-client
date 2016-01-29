@@ -126,7 +126,7 @@ class HTTPClient(object):
         code = self.get_code(response)
         body = self.get_body(response)
 
-        print body
+        print response
 
         return HTTPResponse(code, body)
 
@@ -148,7 +148,7 @@ class HTTPClient(object):
         code = self.get_code(response)
         body = self.get_body(response)
 
-        print body
+        print response
 
         return HTTPResponse(code, body)
 
