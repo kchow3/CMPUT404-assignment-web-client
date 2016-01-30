@@ -109,6 +109,10 @@ class HTTPClient(object):
                 self.path = ''
             else:
                 self.path = match.group(6)
+
+            if(match.group(7) is not None):
+                self.path += match.group(7)
+
         except:
             raise Exception('Could not parse url. Not a valid url')
 
