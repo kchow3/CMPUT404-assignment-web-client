@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 # Copyright 2016 Abram Hindle, https://github.com/tywtyw2002, and https://github.com/treedust
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -53,17 +53,17 @@ class HTTPClient(object):
         return clientSocket
 
     def get_code(self, data):
-        sections = data.split('\r\n\r\n')
+        sections = data.split('\r\n\r\n', 1)
         header_lines = str.splitlines(sections[0])
         http_line = header_lines[0].split()
         return int(http_line[1])
 
     def get_headers(self, data):
-        sections = data.split('\r\n\r\n')
+        sections = data.split('\r\n\r\n', 1)
         return sections[0]
 
     def get_body(self, data):
-        sections = data.split('\r\n\r\n')
+        sections = data.split('\r\n\r\n', 1)
         return sections[1]
 
     def build_request(self, data=None):
